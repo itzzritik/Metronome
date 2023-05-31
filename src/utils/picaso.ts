@@ -1,94 +1,47 @@
-export default function Picaso() {
+export default function Picaso(playSound: boolean) {
 	const paper = <HTMLCanvasElement> document.getElementById("paper");
 	const pen = paper.getContext("2d");
-	
-    const get = (selector: string) => document.querySelector(selector);
-	const toggles = {
-		sound: get("#sound-toggle"),
-	};
 
-	// Use whatever colors you want
-	// https://unsplash.com/photos/tZCrFpSNiIQ
-	// const colors = [
-	//   "#D0E7F5",
-	//   "#D9E7F4",
-	//   "#D6E3F4",
-	//   "#BCDFF5",
-	//   "#B7D9F4",
-	//   "#C3D4F0",
-	//   "#9DC1F3",
-	//   "#9AA9F4",
-	//   "#8D83EF",
-	//   "#AE69F0",
-	//   "#D46FF1",
-	//   "#DB5AE7",
-	//   "#D911DA",
-	//   "#D601CB",
-	//   "#E713BF",
-	//   "#F24CAE",
-	//   "#FB79AB",
-	//   "#FFB6C1",
-	//   "#FED2CF",
-	//   "#FDDFD5",
-	//   "#FEDCD1"
-	// ];
-	// Here I'm using the same color for all 21 arcs
+    if (!pen) return;
+
 	const colors = Array(21).fill("#A6C48A");
-
 	const settings = {
 		startTime: new Date().getTime(), // This can be in the future
 		duration: 900, // Total time for all dots to realign at the starting point
 		maxCycles: Math.max(colors.length, 100), // Must be above colors.length or else...
-		soundEnabled: false, // User still must interact with screen first
 		pulseEnabled: true, // Pulse will only show if sound is enabled as well
 		instrument: "vibraphone", // "default" | "wave" | "vibraphone"
 	};
 
-	const handleSoundToggle = (enabled = !settings.soundEnabled) => {
-		settings.soundEnabled = enabled;
-		toggles.sound.dataset.toggled = enabled;
-	};
-
-	document.onvisibilitychange = () => handleSoundToggle(false);
-
-	paper.onclick = () => handleSoundToggle();
-
-	const getFileName = (index) => {
+	const getFileName = (index: number) => {
 		if (settings.instrument === "default") return `key-${index}`;
-
 		return `${settings.instrument}-key-${index}`;
 	};
-
-	const getUrl = (index) =>
-		`https://assets.codepen.io/1468070/${getFileName(index)}.wav`;
-
 	const keys = colors.map((color, index) => {
-		const audio = new Audio(getUrl(index));
-
+		const audio = new Audio(`https://assets.codepen.io/1468070/${getFileName(index)}.wav`);
 		audio.volume = 0.15;
-
 		return audio;
 	});
 
-	let arcs = [];
+	let arcs: IArc[] = [];
 
-	const calculateVelocity = (index) => {
+	const calculateVelocity = (index: number) => {
 		const numberOfCycles = settings.maxCycles - index,
 			distancePerCycle = 2 * Math.PI;
 
 		return (numberOfCycles * distancePerCycle) / settings.duration;
 	};
 
-	const calculateNextImpactTime = (currentImpactTime, velocity) => {
+	const calculateNextImpactTime = (currentImpactTime: number, velocity: number) => {
 		return currentImpactTime + (Math.PI / velocity) * 1000;
 	};
 
 	const calculateDynamicOpacity = (
-		currentTime,
-		lastImpactTime,
-		baseOpacity,
-		maxOpacity,
-		duration
+		currentTime: number,
+		lastImpactTime: number,
+		baseOpacity: number,
+		maxOpacity: number,
+		duration: number
 	) => {
 		const timeSinceImpact = currentTime - lastImpactTime,
 			percentage = Math.min(timeSinceImpact / duration, 1),
@@ -98,11 +51,11 @@ export default function Picaso() {
 	};
 
 	const determineOpacity = (
-		currentTime,
-		lastImpactTime,
-		baseOpacity,
-		maxOpacity,
-		duration
+		currentTime: number,
+		lastImpactTime: number,
+		baseOpacity: number,
+		maxOpacity: number,
+		duration: number
 	) => {
 		if (!settings.pulseEnabled) return baseOpacity;
 
@@ -115,12 +68,12 @@ export default function Picaso() {
 		);
 	};
 
-	const calculatePositionOnArc = (center, radius, angle) => ({
+	const calculatePositionOnArc = (center: ICoordinate, radius: number, angle: number) => ({
 		x: center.x + radius * Math.cos(angle),
 		y: center.y + radius * Math.sin(angle),
 	});
 
-	const playKey = (index) => keys[index].play();
+	const playKey = (index: number) => keys[index].play();
 
 	const init = () => {
 		pen.lineCap = "round";
@@ -142,7 +95,7 @@ export default function Picaso() {
 		});
 	};
 
-	const drawArc = (x, y, radius, start, end, action = "stroke") => {
+	const drawArc = (x: number, y: number, radius: number, start: number, end: number, action = "stroke") => {
 		pen.beginPath();
 
 		pen.arc(x, y, radius, start, end);
@@ -151,14 +104,13 @@ export default function Picaso() {
 		else pen.fill();
 	};
 
-	const drawPointOnArc = (center, arcRadius, pointRadius, angle) => {
+	const drawPointOnArc = (center: ICoordinate, arcRadius: number, pointRadius: number, angle: number) => {
 		const position = calculatePositionOnArc(center, arcRadius, angle);
 
 		drawArc(position.x, position.y, pointRadius, 0, 2 * Math.PI, "fill");
 	};
 
 	const draw = () => {
-		// Definitely not optimized
 		paper.width = paper.clientWidth;
 		paper.height = paper.clientHeight;
 
@@ -168,17 +120,17 @@ export default function Picaso() {
 		const length = Math.min(paper.width, paper.height) * 0.9,
 			offset = (paper.width - length) / 2;
 
-		const start = {
+		const start: ICoordinate = {
 			x: offset,
 			y: paper.height / 2,
 		};
 
-		const end = {
+		const end: ICoordinate = {
 			x: paper.width - offset,
 			y: paper.height / 2,
 		};
 
-		const center = {
+		const center: ICoordinate = {
 			x: paper.width / 2,
 			y: paper.height / 2,
 		};
@@ -188,17 +140,18 @@ export default function Picaso() {
 			minAngle: 0,
 			startAngle: 0,
 			maxAngle: 2 * Math.PI,
+            initialRadius: 0,
+            circleRadius: 0,
+            clearance: 0,
+            spacing: 0,
 		};
 
 		base.initialRadius = base.length * 0.05;
 		base.circleRadius = base.length * 0.006;
 		base.clearance = base.length * 0.03;
-		base.spacing =
-			(base.length - base.initialRadius - base.clearance) /
-			2 /
-			colors.length;
+		base.spacing = (base.length - base.initialRadius - base.clearance) / 2 / colors.length;
 
-		arcs.forEach((arc, index) => {
+		arcs.forEach((arc: IArc, index: number) => {
 			const radius = base.initialRadius + base.spacing * index;
 
 			// Draw arcs
@@ -248,7 +201,7 @@ export default function Picaso() {
 			pen.fillStyle = arc.color;
 
 			if (currentTime >= arc.nextImpactTime) {
-				if (settings.soundEnabled) {
+				if (playSound) {
 					playKey(index);
 					arc.lastImpactTime = arc.nextImpactTime;
 				}
@@ -264,11 +217,20 @@ export default function Picaso() {
 
 			drawPointOnArc(center, radius, base.circleRadius, angle);
 		});
-
 		requestAnimationFrame(draw);
 	};
 
 	init();
-
 	draw();
+}
+
+interface ICoordinate {
+    x: number,
+    y: number
+}
+interface IArc {
+    color: string,
+    velocity: number,
+    lastImpactTime: number,
+    nextImpactTime: number
 }

@@ -1,42 +1,45 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import styles from "./page.module.scss";
+import Picaso from "@/utils/picaso";
 
 export default function Home() {
-  console.log('Styles:', styles)
-	return (<></>
-		// <>
-		// 	<div className={styles.controlBar}>
-		// 		<div id="control-bar">
-		// 			<button
-		// 				id="sound-toggle"
-		// 				className="toggle"
-		// 				type="button"
-		// 				data-toggled="false"
-		// 				onClick={() => console.log('asd')}
-		// 				title="Toggle Pulse"
-		// 			>
-		// 				<i className="fa-solid fa-music-slash off"></i>
-		// 				<i className="fa-solid fa-music on"></i>
-		// 			</button>
-		// 		</div>
-		// 	</div>
+  const [playSound, setPlaySound] = useState(false);
 
-		// 	<div id="background-image"></div>
+  useEffect(() => {
+    document.onvisibilitychange = () => setPlaySound(false);
+    Picaso(playSound);
+  },[playSound, setPlaySound]);
 
-		// 	<div id="background-filter"></div>
+	return (
+		<div className={`${styles.metronome} ${playSound ? styles.playSound : ''}`}>
+      <div className={styles.backgroundImage} />
+      <div className={styles.backgroundFilter} />
+			<div className={styles.controls}>
+				<button
+					className={styles.soundToggle}
+					title="Toggle Sound"
+					onClick={() => setPlaySound((val) => !val)}
+				>
+          {
+            playSound ? '🔊' : '🔇'
+          }
+				</button>
+			</div>
+      <div className={styles.soundMessage}>
+				<p>Click anywhere to toggle sound</p>
+			</div>
 
-		// 	<div id="logo">
-		// 		<img
-		// 			src="https://assets.codepen.io/1468070/Hyperplexed+Logo+-+White.png"
-		// 			alt=""
-		// 		/>
-		// 	</div>
+			{/* <div id="logo">
+				<img
+					src="https://assets.codepen.io/1468070/Hyperplexed+Logo+-+White.png"
+					alt=""
+				/>
+			</div> */}
 
-		// 	<div id="sound-message">
-		// 		<p>Click anywhere to toggle sound</p>
-		// 	</div>
-
-		// 	<canvas id="paper"></canvas>
-		// </>
+			<canvas id="paper" className={styles.paper} onClick={() => setPlaySound((val) => !val)} />
+		</div>
 	);
 }
