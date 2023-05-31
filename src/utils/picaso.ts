@@ -1,4 +1,4 @@
-export default function Picaso(playSound: boolean) {
+export default function Picaso() {
 	const paper = <HTMLCanvasElement> document.getElementById("paper");
 	const pen = paper.getContext("2d");
 
@@ -18,7 +18,7 @@ export default function Picaso(playSound: boolean) {
 		return `${settings.instrument}-key-${index}`;
 	};
 	const keys = colors.map((color, index) => {
-		const audio = new Audio(`https://assets.codepen.io/1468070/${getFileName(index)}.wav`);
+		const audio = new Audio(`/media/${getFileName(index)}.wav`);
 		audio.volume = 0.15;
 		return audio;
 	});
@@ -28,7 +28,6 @@ export default function Picaso(playSound: boolean) {
 	const calculateVelocity = (index: number) => {
 		const numberOfCycles = settings.maxCycles - index,
 			distancePerCycle = 2 * Math.PI;
-
 		return (numberOfCycles * distancePerCycle) / settings.duration;
 	};
 
@@ -114,11 +113,11 @@ export default function Picaso(playSound: boolean) {
 		paper.width = paper.clientWidth;
 		paper.height = paper.clientHeight;
 
-		const currentTime = new Date().getTime(),
-			elapsedTime = (currentTime - settings.startTime) / 1000;
-
-		const length = Math.min(paper.width, paper.height) * 0.9,
-			offset = (paper.width - length) / 2;
+        const playSound = document.getElementById("playSound")?.dataset?.playsound === "true";
+		const currentTime = new Date().getTime();
+		const elapsedTime = (currentTime - settings.startTime) / 1000;
+		const length = Math.min(paper.width, paper.height) * 0.9;
+		const offset = (paper.width - length) / 2;
 
 		const start: ICoordinate = {
 			x: offset,

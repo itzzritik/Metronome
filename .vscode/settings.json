@@ -1,6 +1,18 @@
 {
+    "css.validate": false,
+	"less.validate": false,
+	"scss.validate": false,
+    "files.eol": "\n",
+	"editor.tabSize": 4,
+	"editor.insertSpaces": false,
+	"editor.detectIndentation": false,
+	"editor.codeActionsOnSave": {
+		"source.fixAll.eslint": true,
+	},
+
     "cSpell.words": [
         "Picaso",
+        "playsound",
         "Polyrhythm",
         "Polyrhythmic"
     ]
