@@ -1,4 +1,6 @@
 import "./globals.scss";
+import { Montserrat } from 'next/font/google'
+const montserrat = Montserrat({  weight: '400', subsets: ['latin'] })
 
 export const metadata = {
 	title: "Polyrhythmic Metronome",
@@ -8,7 +10,7 @@ export const metadata = {
 export default function RootLayout({ children }: IRootLayoutProps) {
 	return (
 		<html lang="en">
-			<body>{children}</body>
+			<body style={{['--fontFamily' as any]: montserrat.style.fontFamily}}>{children}</body>
 		</html>
 	);
 }
