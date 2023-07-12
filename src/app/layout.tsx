@@ -1,5 +1,6 @@
-import "./globals.scss";
 import { Montserrat } from 'next/font/google'
+import "./globals.scss";
+
 const montserrat = Montserrat({  weight: '400', subsets: ['latin'] })
 
 export const metadata = {
@@ -10,7 +11,9 @@ export const metadata = {
 export default function RootLayout({ children }: IRootLayoutProps) {
 	return (
 		<html lang="en">
-			<body style={{['--fontFamily' as any]: montserrat.style.fontFamily}}>{children}</body>
+			<body style={{['--fontFamily' as any]: montserrat.style.fontFamily}}>
+				{children}
+			</body>
 		</html>
 	);
 }
